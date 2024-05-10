@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venta de Productos</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #productDetails {
+            margin-top: 20px;
+        }
+
+        #salesTable {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        #salesTable th, #salesTable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #totalSaleAmount {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Venta de Productos</h1>
+
+    <!-- Selección de Producto -->
+    <label for="selectProduct">Seleccione un producto:</label>
+    <select id="selectProduct">
+        <option value="">-- Seleccione --</option>
+        <% productos.forEach(producto => { %>
+            <option value="<%= producto.code %>"><%= producto.description %></option>
+        <% }); %>
+    </select>
+
+    <!-- Detalles del Producto -->
+    <div id="productDetails"></div>
+
+    <!-- Tabla de Productos Agregados -->
+    <table id="salesTable">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody id="salesTableBody"></tbody>
+        <tfoot>
+            <tr>
+                <td><strong>Total Venta:</strong></td>
+                <td id="totalSaleAmount">0 USD</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        const selectProduct = document.getElementById('selectProduct');
+        const productDetails = document.getElementById('productDetails');
+        const salesTableBody = document.getElementById('salesTableBody');
+        const totalSaleAmount = document.getElementById('totalSaleAmount');
+        let totalSale = 0;
+
+        selectProduct.addEventListener('change', () => {
+            const selectedCode = selectProduct.value;
+            const selectedProduct = productos.find(producto => producto.code === selectedCode);
+
+            if (selectedProduct) {
+                productDetails.innerHTML = `
+                    <p><strong>Descripción:</strong> ${selectedProduct.description}</p>
+                    <p><strong>Precio:</strong> ${selectedProduct.value} USD</p>
+                    <p><strong>Stock Disponible:</strong> ${selectedProduct.stock}</p>
+                `;
+            } else {
+                productDetails.innerHTML = '';
+            }
+        });
+
+        function addProductToSale() {
+            const selectedCode = selectProduct.value;
+            const selectedProduct = productos.find(producto => producto.code === selectedCode);
+
+            if (selectedProduct) {
+                if (selectedProduct.stock > 0) {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${selectedProduct.description}</td>
+                        <td>${selectedProduct.value} USD</td>
+                    `;
+                    salesTableBody.appendChild(newRow);
+
+                    totalSale += selectedProduct.value;
+                    totalSaleAmount.textContent = `${totalSale} USD`;
+
+                    selectedProduct.stock--;
+                    productDetails.innerHTML = `
+                        <p><strong>Descripción:</strong> ${selectedProduct.description}</p>
+                        <p><strong>Precio:</strong> ${selectedProduct.value} USD</p>
+                        <p><strong>Stock Disponible:</strong> ${selectedProduct.stock}</p>
+                    `;
+                } else {
+                    alert('¡No hay suficiente stock disponible para este producto!');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
